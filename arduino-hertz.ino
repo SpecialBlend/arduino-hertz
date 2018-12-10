@@ -55,13 +55,17 @@ float sine(float frequency) {
    ===========
    The lowest frequency needed to measure. This is used to set the sample size.
 */
+#if MOCK_MODE
+#define LOWEST_TARGET_FREQUENCY MOCK_FREQUENCY_LOW
+#else
 #define LOWEST_TARGET_FREQUENCY 1
+#endif
 
 /**
-   Set sample size as twice the Lowest Target Frequency.
+   Set sample size according to Lowest Target Frequency.
    Anything lower will produce inaccurate results.
 */
-#define SAMPLE_SIZE LOWEST_TARGET_FREQUENCY * 2000000
+#define SAMPLE_SIZE 2000000 / LOWEST_TARGET_FREQUENCY
 
 /**
    ===== !! Do not edit anything below this line !! =====
