@@ -8,7 +8,7 @@
 
 #if MOCK_MODE
 #define MOCK_FREQUENCY_LOW 20
-#define MOCK_FREQUENCY_HIGH 240
+#define MOCK_FREQUENCY_HIGH 60
 #define MOCK_BURST_LENGTH 2000000
 
 float MOCK_FREQUENCY_CURRENT = 0;
@@ -79,8 +79,26 @@ float sine(float frequency) {
 unsigned long clock_X = 0;
 unsigned int cycles_X = 0;
 unsigned int signal_X = 0;
-float amplitude_X = 0;
 float frequency_X = 0;
+
+unsigned long clock_Y = 0;
+unsigned int cycles_Y = 0;
+unsigned int signal_Y = 0;
+float frequency_Y = 0;
+
+unsigned long clock_Z = 0;
+unsigned int cycles_Z = 0;
+unsigned int signal_Z = 0;
+float frequency_Z = 0;
+
+unsigned long clock_V = 0;
+unsigned int cycles_V = 0;
+unsigned int signal_V = 0;
+float frequency_V = 0;
+
+float vector(float x, float y, float z) {
+  return sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
+}
 
 /**
    Reset sample counters
@@ -97,7 +115,7 @@ void sample(unsigned long *clock, unsigned int *cycles, float *frequency) {
   const float time = utime / 1000000;
   const float c = *cycles;
   const float f = c / time / 2;
-  *frequency = (f + *frequency) /2;
+  *frequency = (f + *frequency) / 2;
   resetSample(cycles, frequency);
 }
 
@@ -125,15 +143,28 @@ void loop() {
     MOCK_BURST_CLOCK = micros();
     MOCK_BURST_STATE ^= 1;
   }
-  const float amplitude_X = sine(MOCK_FREQUENCY_CURRENT);
+  const float MOCK_FREQUENCY_CURRENT_X = MOCK_FREQUENCY_CURRENT;
+  const float MOCK_FREQUENCY_CURRENT_Y = MOCK_FREQUENCY_CURRENT / 2;
+  const float MOCK_FREQUENCY_CURRENT_Z = MOCK_FREQUENCY_CURRENT / 4;
+  const float MOCK_FREQUENCY_CURRENT_V = vector(MOCK_FREQUENCY_CURRENT_X, MOCK_FREQUENCY_CURRENT_Y, MOCK_FREQUENCY_CURRENT_Z);
+  const float amplitude_X = sine(MOCK_FREQUENCY_CURRENT_X);
+  const float amplitude_Y = sine(MOCK_FREQUENCY_CURRENT_Y);
+  const float amplitude_Z = sine(MOCK_FREQUENCY_CURRENT_Z);
   tick(amplitude_X, &clock_X, &cycles_X, &signal_X, &frequency_X);
+  tick(amplitude_Y, &clock_Y, &cycles_Y, &signal_Y, &frequency_Y);
+  tick(amplitude_Z, &clock_Z, &cycles_Z, &signal_Z, &frequency_Z);
+  frequency_V = vector(frequency_X, frequency_Y, frequency_Z);
+  Serial.print(MOCK_FREQUENCY_HIGH);
+  Serial.print("\t");
+  Serial.print(MOCK_FREQUENCY_CURRENT_V);
+  Serial.print("\t");
+  Serial.print(frequency_V);
+  Serial.print("\t");
   Serial.print(amplitude_X * MOCK_FREQUENCY_HIGH / 2);
   Serial.print("\t");
-  Serial.print(MOCK_FREQUENCY_CURRENT);
+  Serial.print(amplitude_Y * MOCK_FREQUENCY_HIGH / 2);
   Serial.print("\t");
-  Serial.print(frequency_X);
-  Serial.print("\t");
-  Serial.print(MOCK_FREQUENCY_HIGH);
+  Serial.print(amplitude_Z * MOCK_FREQUENCY_HIGH / 2);
   Serial.print("\t");
   Serial.println(-MOCK_FREQUENCY_HIGH);
 }
