@@ -7,8 +7,13 @@
 #define MOCK_MODE true
 
 #if MOCK_MODE
-#define MOCK_FREQUENCY_LOW 50
-#define MOCK_FREQUENCY_HIGH 120
+#define MOCK_FREQUENCY_LOW 20
+#define MOCK_FREQUENCY_HIGH 240
+#define MOCK_BURST_LENGTH 2000000
+
+float MOCK_FREQUENCY_CURRENT = 0;
+unsigned long MOCK_BURST_CLOCK = 0;
+unsigned int MOCK_BURST_STATE = 1;
 
 /**
    Simulate a sine wave tick
@@ -22,11 +27,11 @@ float sine(float frequency) {
 #endif
 
 /**
- * ================
- * Plotting Options
- * ================
- */
- 
+   ================
+   Plotting Options
+   ================
+*/
+
 #define AMPLITUDE_MULTIPLIER 1
 #define FREQUENCY_MULTIPLIER 1
 
@@ -65,7 +70,7 @@ float sine(float frequency) {
    Set sample size according to Lowest Target Frequency.
    Anything lower will produce inaccurate results.
 */
-#define SAMPLE_SIZE 2000000 / LOWEST_TARGET_FREQUENCY
+#define SAMPLE_SIZE 1000000 / LOWEST_TARGET_FREQUENCY
 
 /**
    ===== !! Do not edit anything below this line !! =====
@@ -77,27 +82,11 @@ unsigned int signal_X = 0;
 float amplitude_X = 0;
 float frequency_X = 0;
 
-#if MOCK_MODE
-// Current mock frequency to simulate (if MOCK_MODE is enabled)
-float currentMockFrequency = MOCK_FREQUENCY_LOW;
-#endif
-
 /**
    Reset sample counters
 */
 void resetSample(unsigned int *cycles, float *frequency) {
   *cycles = 0;
-  //  *frequency /= 2;
-#if MOCK_MODE
-  currentMockFrequency = random(MOCK_FREQUENCY_LOW, MOCK_FREQUENCY_HIGH);
-#endif
-}
-
-/**
-   Read and normalize physical sensor
-*/
-float readSensor() {
-
 }
 
 /**
@@ -108,7 +97,7 @@ void sample(unsigned long *clock, unsigned int *cycles, float *frequency) {
   const float time = utime / 1000000;
   const float c = *cycles;
   const float f = c / time / 2;
-  *frequency = f;
+  *frequency = (f + *frequency) /2;
   resetSample(cycles, frequency);
 }
 
@@ -128,19 +117,27 @@ void tick(float amplitude, unsigned long *clock, unsigned int *cycles, unsigned 
     *signal ^= 1;
   }
 }
-
-/**
-   App loop
-*/
+#if MOCK_MODE
 void loop() {
-  #if MOCK_MODE
-  const float amplitude_X = sine(currentMockFrequency);
-  #endif
+  const unsigned long time = micros() - MOCK_BURST_CLOCK;
+  if (time > MOCK_BURST_LENGTH) {
+    MOCK_FREQUENCY_CURRENT = MOCK_BURST_STATE ? random(MOCK_FREQUENCY_LOW, MOCK_FREQUENCY_HIGH) : 0;
+    MOCK_BURST_CLOCK = micros();
+    MOCK_BURST_STATE ^= 1;
+  }
+  const float amplitude_X = sine(MOCK_FREQUENCY_CURRENT);
   tick(amplitude_X, &clock_X, &cycles_X, &signal_X, &frequency_X);
-  Serial.print(amplitude_X * AMPLITUDE_MULTIPLIER);
+  Serial.print(amplitude_X * MOCK_FREQUENCY_HIGH / 2);
   Serial.print("\t");
-  Serial.println(frequency_X * FREQUENCY_MULTIPLIER);
+  Serial.print(MOCK_FREQUENCY_CURRENT);
+  Serial.print("\t");
+  Serial.print(frequency_X);
+  Serial.print("\t");
+  Serial.print(MOCK_FREQUENCY_HIGH);
+  Serial.print("\t");
+  Serial.println(-MOCK_FREQUENCY_HIGH);
 }
+#endif
 
 /**
    Setup app
