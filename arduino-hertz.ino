@@ -71,10 +71,11 @@ float sine(float frequency) {
    ===== !! Do not edit anything below this line !! =====
 */
 
-unsigned long clock = 0;
-unsigned int cycles = 0;
-unsigned int signal = 0;
-float frequency = 0;
+unsigned long clock_X = 0;
+unsigned int cycles_X = 0;
+unsigned int signal_X = 0;
+float amplitude_X = 0;
+float frequency_X = 0;
 
 #if MOCK_MODE
 // Current mock frequency to simulate (if MOCK_MODE is enabled)
@@ -84,8 +85,9 @@ float currentMockFrequency = MOCK_FREQUENCY_LOW;
 /**
    Reset sample counters
 */
-void resetSample() {
-  cycles = 0;
+void resetSample(unsigned int *cycles, float *frequency) {
+  *cycles = 0;
+  //  *frequency /= 2;
 #if MOCK_MODE
   currentMockFrequency = random(MOCK_FREQUENCY_LOW, MOCK_FREQUENCY_HIGH);
 #endif
@@ -99,63 +101,50 @@ float readSensor() {
 }
 
 /**
-   Read measurement
-*/
-
-#if MOCK_MODE
-
-float readAmplitude() {
-  return sine(currentMockFrequency);
-}
-
-#else
-float readAmplitude() {
-  return readSensor();
-}
-#endif
-
-/**
    Analyze sample and calculate Current Frequency.
 */
-float sample() {
-  const float utime = micros() - clock;
+void sample(unsigned long *clock, unsigned int *cycles, float *frequency) {
+  const float utime = micros() - *clock;
   const float time = utime / 1000000;
-  const float f = cycles / time / 2;
-  resetSample();
-  return f;
+  const float c = *cycles;
+  const float f = c / time / 2;
+  *frequency = f;
+  resetSample(cycles, frequency);
 }
 
 /**
    Tick tock, app clock.
 */
-float tick() {
-  float amplitude = readAmplitude();
-  if (signal ^ amplitude < ZERO) {
-    cycles++;
-    signal ^= 1;
+void tick(float amplitude, unsigned long *clock, unsigned int *cycles, unsigned int *signal, float *frequency) {
+  const float time = micros() - *clock;
+  if (time > SAMPLE_SIZE) {
+    sample(clock, cycles, frequency);
+    *clock = micros();
   }
-  return amplitude;
+  const unsigned int c = *cycles;
+  const unsigned int s = *signal;
+  if (s ^ amplitude < ZERO) {
+    *cycles = c + 1;
+    *signal ^= 1;
+  }
 }
 
 /**
    App loop
 */
 void loop() {
-  const float time = micros() - clock;
-  if (time > SAMPLE_SIZE) {
-    frequency = sample();
-    clock = micros();
-  }
-  const float amplitude = tick();
-  Serial.print(amplitude);
+  #if MOCK_MODE
+  const float amplitude_X = sine(currentMockFrequency);
+  #endif
+  tick(amplitude_X, &clock_X, &cycles_X, &signal_X, &frequency_X);
+  Serial.print(amplitude_X * AMPLITUDE_MULTIPLIER);
   Serial.print("\t");
-  Serial.println(frequency);
+  Serial.println(frequency_X * FREQUENCY_MULTIPLIER);
 }
 
 /**
    Setup app
 */
 void setup() {
-  resetSample();
   Serial.begin(BAUD_RATE);
 }
