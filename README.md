@@ -12,7 +12,7 @@ Measure amplitude and frequency of vibrations using an Arduino Uno with an LIS3D
 - Plotting mode: amplitude
 - Sensor is placed flat on wooden desk.
 - First few seconds shows natural resonance being auto-calibrated.
-- Subsequent surges are from dropping an empty caffeine-free can of coke on the desk from ~6" high. 
+- Subsequent surges are from dropping an empty can of caffeine-free coke on the desk from ~6" high. 
 - Blue=X, Red=Y, Green=Z
 
 ![](demo.gif)
