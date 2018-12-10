@@ -22,6 +22,15 @@ float sine(float frequency) {
 #endif
 
 /**
+ * ================
+ * Plotting Options
+ * ================
+ */
+ 
+#define AMPLITUDE_MULTIPLIER 1
+#define FREQUENCY_MULTIPLIER 1
+
+/**
    =====================
    Configuration Options
    =====================
