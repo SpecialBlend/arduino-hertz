@@ -7,8 +7,8 @@
 #define MOCK_MODE true
 
 #if MOCK_MODE
-#define MOCK_FREQUENCY_LOW 1
-#define MOCK_FREQUENCY_HIGH 5
+#define MOCK_FREQUENCY_LOW 50
+#define MOCK_FREQUENCY_HIGH 120
 
 /**
    Simulate a sine wave tick
