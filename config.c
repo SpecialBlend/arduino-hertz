@@ -37,7 +37,7 @@
    Filter sensitivity threshold
    Higher is more sensitive.
 */
-#define CALIBRATION_FILTER_SENSITIVITY 0.75
+#define CALIBRATION_FILTER_SENSITIVITY .9
 
 /**
    Zero sensitivity threshold

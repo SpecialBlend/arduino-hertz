@@ -9,18 +9,16 @@ struct Axis_s *zero_axis(struct Axis_s *axis_s) {
 }
 
 struct Axis_s *filter_axis(struct Axis_s *axis_s, float sensitivity) {
-  if (axis_s->calibration_s.filter) {
-    float ceiling = sensitivity / axis_s->calibration_s.filter;
-    if (axis_s->amplitude_s.normalized < ceiling) {
-      axis_s->amplitude_s.normalized = 0;
-    }
-
+  const float high = axis_s->calibration_s.high /  sensitivity;
+  const float low = axis_s->calibration_s.low /  sensitivity;
+  if (axis_s->amplitude_s.raw > high || axis_s->amplitude_s.raw < low) {
+    axis_s->amplitude_s.normalized = 0;
   }
   return axis_s;
 }
 
-struct Axis_s *normalize_axis(struct Axis_s *axis_s) {
-  return zero_axis(axis_s);
+struct Axis_s *normalize_axis(struct Axis_s *axis_s, float sensitivity_filter) {
+  return filter_axis(zero_axis(axis_s), sensitivity_filter);
 }
 
 void calibrate_zero(struct Axis_s *axis_s, float sensitivity) {
@@ -53,13 +51,16 @@ void calibrate_filter(struct Axis_s *axis_s, float sensitivity) {
   //  axis_s->calibration_s.filter = avg(axis_s->calibration_s.filter, max(axis_s->calibration_s.filter, abs(normalized_amplitude)));
 }
 
-void calibrate_axis(struct Axis_s *axis_s, float sensitivity_zero, float sensitivity_filter) {
+void calibrate_axis(struct Axis_s *axis_s, float sensitivity_zero) {
   calibrate_zero(axis_s, sensitivity_zero);
-  calibrate_filter(axis_s, sensitivity_filter);
 }
 
-float get_amplitude_normalized(struct Axis_s *axis_s) {
-  return normalize_axis(axis_s)->amplitude_s.normalized;
+float get_amplitude_normalized(struct Axis_s *axis_s, float sensitivity_filter) {
+  return normalize_axis(axis_s, sensitivity_filter)->amplitude_s.normalized;
+}
+
+float get_amplitude_zeroed(struct Axis_s *axis_s) {
+  return zero_axis(axis_s)->amplitude_s.normalized;
 }
 
 void set_axis_calibration_state(struct Axis_s *axis_s, unsigned int state) {
