@@ -1,4 +1,5 @@
-#pragma once
+#ifndef INCLUDE_CONFIG_H
+#define INCLUDE_CONFIG_H
 
 /**
    =============
@@ -35,5 +36,7 @@
 /**
    Filter sensitivity threshold
    Higher is more sensitive.
- */
+*/
 #define SENSITIVTY 0.7
+
+#endif

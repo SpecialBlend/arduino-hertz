@@ -1,4 +1,5 @@
-#pragma once
+#ifndef INCLUDE_CALIBRATION_H
+#define INCLUDE_CALIBRATION_H
 
 struct Axis_s *zero_axis(struct Axis_s *axis_s);
 
@@ -17,3 +18,5 @@ float get_amplitude_normalized(struct Axis_s *axis_s);
 void set_axis_calibration_state(struct Axis_s *axis_s, bool state);
 
 unsigned int get_axis_calibration_state(struct Axis_s *axis_s);
+
+#endif
