@@ -19,7 +19,7 @@ struct Axis_s *filter_axis(struct Axis_s *axis_s, float sensitivity) {
   return axis_s;
 }
 
-struct Axis_s *normalize_axis(struct Axis_s *axis_s, float sensitivity) {
+struct Axis_s *normalize_axis(struct Axis_s *axis_s) {
   return zero_axis(axis_s);
 }
 
@@ -58,8 +58,8 @@ void calibrate_axis(struct Axis_s *axis_s, float sensitivity_zero, float sensiti
   calibrate_filter(axis_s, sensitivity_filter);
 }
 
-float get_amplitude_normalized(struct Axis_s *axis_s, float sensitivity) {
-  return normalize_axis(axis_s, sensitivity)->amplitude_s.normalized;
+float get_amplitude_normalized(struct Axis_s *axis_s) {
+  return normalize_axis(axis_s)->amplitude_s.normalized;
 }
 
 void set_axis_calibration_state(struct Axis_s *axis_s, unsigned int state) {

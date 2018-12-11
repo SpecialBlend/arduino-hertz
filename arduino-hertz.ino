@@ -46,8 +46,11 @@ void loop() {
   calibrate_axis(&z, CALIBRATION_ZERO_SENSITIVITY, CALIBRATION_FILTER_SENSITIVITY);
   float raw = z.amplitude_s.raw;
   float zero = z.calibration_s.zero;
+  float normalized = get_amplitude_normalized(&z);
   Serial.print(raw);
   Serial.print("\t");
   Serial.print(zero);
+  Serial.print("\t");
+  Serial.print(normalized);
   Serial.print("\r\n");
 }
