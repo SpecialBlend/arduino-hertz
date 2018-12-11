@@ -1,18 +1,3 @@
-/**
-   Mock Mode
-   =========
-   If enabled, will mock a sine wave signal instead of reading physical sensor.
-*/
-#define MOCK_MODE false
-
-#if MOCK_MODE
-
-#include "mock.c"
-
-#else
-
-#define tab "\t"
-
 #include <Arduino.h>
 #include<hardwareSerial.h>
 #include <Wire.h>
@@ -20,7 +5,9 @@
 #include <Adafruit_LIS3DH.h>
 #include <Adafruit_Sensor.h>
 #include "lib.c"
-#include "config.h"
+#include "config.c"
+#include "axis.c"
+#include "calibration.c"
 
 #if defined(ARDUINO_ARCH_SAMD)
 
@@ -29,6 +16,7 @@
 #endif
 
 Adafruit_LIS3DH sensor = Adafruit_LIS3DH();
+Axis_s x, y, z;
 
 void setup() {
   // Temporarily pause serial shields
@@ -42,15 +30,24 @@ void setup() {
   }
   Serial.println("Connected.");
   sensor.setRange(SENSOR_RANGE);
+  x = Axis();
+  y = Axis();
+  z = Axis();
+  if (!get_axis_calibration_state(&x)) {
+    //    calibrate();
+  }
 }
 
 void loop() {
+  unsigned long time = millis() / 1000;
+  unsigned long offset = (time % 2);
   sensor.read();
-  Serial.print(sensor.x);
-  Serial.print(tab);
-  Serial.print(sensor.y);
-  Serial.print(tab);
-  Serial.println(sensor.z);
+  set_amplitude(&z, sensor.z);
+  calibrate_axis(&z, CALIBRATION_ZERO_SENSITIVITY, CALIBRATION_FILTER_SENSITIVITY);
+  float raw = z.amplitude_s.raw;
+  float zero = z.calibration_s.zero;
+  Serial.print(raw);
+  Serial.print("\t");
+  Serial.print(zero);
+  Serial.print("\r\n");
 }
-
-#endif

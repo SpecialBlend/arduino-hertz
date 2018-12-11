@@ -37,6 +37,23 @@
    Filter sensitivity threshold
    Higher is more sensitive.
 */
-#define SENSITIVTY 0.7
+#define CALIBRATION_FILTER_SENSITIVITY 0.75
+
+/**
+   Zero sensitivity threshold
+   Higher is more sensitive.
+*/
+#define CALIBRATION_ZERO_SENSITIVITY 0.05
+
+/**
+   Minimum calibration time in milliseconds
+*/
+#define CALIBRATION_TIME_MIN 1000
+
+/**
+   Maximum calibration time in milliseconds
+*/
+
+#define CALIBRATION_TIME_MAX 5000
 
 #endif

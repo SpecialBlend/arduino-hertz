@@ -3,7 +3,7 @@
 
 //#include<hardwareSerial.h>
 //#include "lib.c"
-//#include "config.h"
+//#include "config.c"
 //#include "axis.c"
 //#include "frequency.c"
 //

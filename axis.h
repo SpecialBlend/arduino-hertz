@@ -6,7 +6,7 @@ struct AxisAmplitude_s {
 };
 
 struct AxisCalibration_s {
-  float zero, filter, state;
+  float low, high, zero, filter, state;
 };
 
 struct AxisFrequency_s {
